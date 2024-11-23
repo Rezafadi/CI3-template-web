@@ -1,0 +1,1443 @@
+saya ingin membuat aplikasi web untuk skripsi saya yg berjudul 
+APLIKASI SISTEM PAKAR DIAGNOSA PENYAKIT PENCERNAAN PADA MANUSIA MENGGUNAKAN METODE DEEP LEARNING BERBASIS WEBSITE
+(Studi Kasus: Klinik Dr. Ranny)
+
+dan saya ingin membuat menggunakan PHP dengan CI3 dan golang dengan fiber sebagai deep learningnya
+
+berikut data databasenya
+-- phpMyAdmin SQL Dump
+-- version 4.8.5
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Waktu pembuatan: 07 Agu 2024 pada 18.15
+-- Versi server: 10.1.38-MariaDB
+-- Versi PHP: 5.6.40
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: spcbrv1
+--
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel tb_admin
+--
+
+CREATE TABLE tb_admin (
+  id_admin int(11) NOT NULL,
+  username varchar(10) NOT NULL,
+  password varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel tb_admin
+--
+
+INSERT INTO tb_admin (id_admin, username, password) VALUES
+(2, 'admin', 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel tb_ciri
+--
+
+CREATE TABLE tb_ciri (
+  id_ciri int(11) NOT NULL,
+  nama_ciri text NOT NULL,
+  bobot int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel tb_ciri
+--
+
+INSERT INTO tb_ciri (id_ciri, nama_ciri, bobot) VALUES
+(40, 'rasa terbakar di ulu hati', 3),
+(41, 'merasa tidak nyaman setelah makan', 2),
+(43, 'luka dibagian usus', 4),
+(44, 'sakit 2-4 jam setelah makan', 3),
+(45, 'makan meredakan sakit', 2),
+(46, 'fases hitam', 3),
+(51, 'merasa cepat kenyang', 2),
+(52, 'dada terasa terbakar/ulu hati terasa panas', 3),
+(53, 'mulut terasa pait', 2),
+(54, 'kesulitan menelan', 2),
+(55, 'fases cair lebih dari 4x sehari', 3),
+(57, 'rasa ingin muntah', 2),
+(58, 'dehidrasi ringan', 3),
+(59, 'mata cekung', 4),
+(60, 'dehidrasi berat', 4),
+(61, 'malas untuk minum', 4),
+(62, 'sakit perut dibagian bawah', 3),
+(63, 'mual dan muntah', 3),
+(64, 'jarang minum', 2),
+(65, 'buang air besar menjadi sering terasa perih dan panas', 3),
+(66, 'sakit hebat dibagian perut kanan bawah', 4),
+(67, 'demam', 2),
+(68, 'anoreksia', 3),
+(70, 'perpindahan sakit dari ulu hati ke perut kanan bawah', 3),
+(71, 'terdapat benjolan dibagian anus', 3),
+(72, 'keluar saat mengejan yang hebat', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel tb_dokter
+--
+
+CREATE TABLE tb_dokter (
+  id_dokter int(11) NOT NULL,
+  fullname varchar(50) NOT NULL,
+  username varchar(10) DEFAULT NULL,
+  password varchar(20) DEFAULT NULL,
+  jenis_kelamin varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel tb_dokter
+--
+
+INSERT INTO tb_dokter (id_dokter, fullname, username, password, jenis_kelamin) VALUES
+(1, 'Muhammad Reza', 'reza', 'password', 'Laki-laki');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel tb_jenis
+--
+
+CREATE TABLE tb_jenis (
+  id_jenis varchar(5) NOT NULL,
+  nama_jenis varchar(30) NOT NULL,
+  detail_jenis text NOT NULL,
+  solusi_jenis text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel tb_jenis
+--
+
+INSERT INTO tb_jenis (id_jenis, nama_jenis, detail_jenis, solusi_jenis) VALUES
+('A01', 'Dispepsia', 'kondisi berupa gangguan pencernaan kronis yang ditandai dengan perut terasa nyeri, kembung, dan begah terutama setelah mengonsumsi makanan.', 'Konsumsi obat-obatan seperti obat antagonis H2 yang bertujuan mengurangi produksi asam lambung, atau PPI. Jaga berat badan yang ideal, kurangi setres, hindari berbaring setelah makan, membatasi konsumsi kafein, membatasi konsumsi makanan berlemak, misalnya makanan bersantan dan keju. Membatasi konsumsi makanan yang menimbulkan gas, seperti kol, kubis, dan kentang.'),
+('A02', 'Ulkus Duodenum', 'Ulkus duodenum disebabkan oleh ketidakseimbangan jumlah asam lambung.  Cairan tersebut diproduksi untuk membantu proses pencernaan makanan serta membunuh bakteri yang masuk ke dalam lambung. Namun, asam lambung bersifat korosif sehingga mampu merusak lapisan lambung serta duodenum ketika jumlahnya berlebihan. Lambat laun, jumlah yang tidak terkontrol bisa melukai lapisan duodenum.', 'Turunkan berat badan jika memiliki berat badan berlebih, konsumsi makanan dalam porsi kecil, hindari kebiasaan merokok, menghindari makanan atau minuman seperti kopi, cokelat, tomat, makanan berlemak, atau makanan pedas. Usahakan tidak mengonsumsi makanan setidaknya tiga jam sebelum tidur, membatasi konsumsi alkohol.'),
+('A03', 'Gerd', 'Gastroesophageal reflux disease atau GERD adalah gangguan sistem saluran pencernaan, di mana asam lambung naik ke kerongkongan (esofagus). ', 'Menghindari makan dalam porsi besar dan berat di malam hari, Meninggikan posisi kepala saat berbaring, terapkan pola makan yang sehat dengan nutrisi seimbang, kunyah makanan secara menyeluruh,  mengkonsumsi obat-obatan sesuai dengan petunjuk dan resep dokter.'),
+('A04', 'Diare', 'gangguan pencernaan yang diakibatkan oleh banyak faktor. Beberapa penyebab diare yang umum diantaranya keracunan makanan, alergi makanan, atau makan pada saat yang tidak tepat.', 'Rajin mencuci tangan dengan sabun dan air mengalir, terutama sebelum dan setelah makan. Mencuci buah dan sayur, serta mengolah bahan makanan, seperti daging sampai benar-benar matang. Konsumsilah suplemen makanan, seperti probiotik yang mengandung Lactobacillus acidophilus, terutama bila diare terjadi karena efek samping antibiotik. Jangan mengonsumsi makanan tinggi lemak, berserat, atau memiliki rasa pedas. Hindari konsumsi yoghurt bila mengalami diare karena intoleransi laktosa.'),
+('A05', 'Infeksi Saluran Kemih', 'kondisi ketika sistem kemih mengalami infeksi. Bisa di bagian ureter, ginjal, kandung kemih, dan uretra. Umumnya, infeksi tersebut menyerang dua bagian, yaitu uretra dan juga kandung kemih.', 'Tidak menahan kencing, minum banyak air, jangan menggunakan pakaian bawahan yang ketat karena akan meningkatkan kelembapan, lakukan kompres hangat di perut bagian bawah atau berendam di dalam air hangat selama 15–20 menit untuk meredakan nyeri.'),
+('A06', 'Usus Buntu', 'Radang usus buntu atau apendisitis termasuk jenis penyakit sistem pencernaan yang ditandai dengan peradangan pada apendiks alias usus buntu. Hal ini bisa disebabkan karena usus buntu tersumbat oleh benda asing, kanker atau infeksi.', 'apendisitis bisa ditangani dengan pengangkatan usus buntu. usus buntu bisa ditangani hanya dengan pemberian antibiotic dengan syarat tingkat peradangan usus buntu belum terlalu parah. Untuk tingkat peradangan yang parah apalagi usus buntu yang sudah pecah, pilihan pengobatan satu-satunya dengan dilakukan appendectomy (bedah pengangkatan usus buntu).'),
+('A07', 'Wasir', 'Pembesaran atau pembengkakan yang terjadi pada dubur atau usus besar bagian akhir atau rektum. Kondisi ini menjadi masalah kesehatan yang bisa menyerang siapa saja, tetapi lebih banyak terjadi pada orang berusia 50 tahun ke atas.', 'Jangan menahan buang air besar, hindari mengejan terlalu keras saat BAB, banyak minum air, hindari minuman yang berkafein dan bersoda, berolahraga secara rutin, bersihkan area anus setelah BAB dengan cara ditepuk-tepuk bukan dengan digosok-gosok.');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel tb_klasifikasi
+--
+
+CREATE TABLE tb_klasifikasi (
+  id_klasifikasi int(11) NOT NULL,
+  id_jenis varchar(5) NOT NULL,
+  id_ciri int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel tb_klasifikasi
+--
+
+INSERT INTO tb_klasifikasi (id_klasifikasi, id_jenis, id_ciri) VALUES
+(63, 'A01', 40),
+(64, 'A01', 41),
+(65, 'A01', 51),
+(66, 'A02', 43),
+(67, 'A02', 44),
+(68, 'A02', 45),
+(69, 'A02', 46),
+(70, 'A03', 52),
+(71, 'A03', 53),
+(72, 'A03', 54),
+(73, 'A04', 55),
+(74, 'A04', 57),
+(75, 'A04', 58),
+(76, 'A04', 59),
+(77, 'A04', 60),
+(78, 'A04', 61),
+(79, 'A05', 62),
+(80, 'A05', 63),
+(81, 'A05', 64),
+(82, 'A05', 65),
+(83, 'A06', 66),
+(84, 'A06', 67),
+(85, 'A06', 68),
+(86, 'A06', 63),
+(87, 'A06', 70),
+(88, 'A07', 71),
+(89, 'A07', 72);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel tb_pasien
+--
+
+CREATE TABLE tb_pasien (
+  id_pasien int(10) NOT NULL,
+  nama_pasien varchar(255) NOT NULL,
+  jenis_kelamin varchar(255) NOT NULL,
+  no_tlp varchar(15) NOT NULL,
+  id_penyakit varchar(255) NOT NULL,
+  tgl_diagnosa date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel tb_pasien
+--
+
+INSERT INTO tb_pasien (id_pasien, nama_pasien, jenis_kelamin, no_tlp, id_penyakit, tgl_diagnosa) VALUES
+(2, 'putri', 'Perempuan', '1234567891011', 'A03', '2024-08-04'),
+(3, 'reza', 'Laki-laki', '1234214234', 'A06', '2024-08-05'),
+(4, 'reza fadilah', 'Laki-laki', '1234214234', 'A02', '2024-08-07');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indeks untuk tabel tb_admin
+--
+ALTER TABLE tb_admin
+  ADD PRIMARY KEY (id_admin);
+
+--
+-- Indeks untuk tabel tb_ciri
+--
+ALTER TABLE tb_ciri
+  ADD PRIMARY KEY (id_ciri);
+
+--
+-- Indeks untuk tabel tb_dokter
+--
+ALTER TABLE tb_dokter
+  ADD PRIMARY KEY (id_dokter);
+
+--
+-- Indeks untuk tabel tb_jenis
+--
+ALTER TABLE tb_jenis
+  ADD PRIMARY KEY (id_jenis);
+
+--
+-- Indeks untuk tabel tb_klasifikasi
+--
+ALTER TABLE tb_klasifikasi
+  ADD PRIMARY KEY (id_klasifikasi),
+  ADD KEY id_jenis (id_jenis),
+  ADD KEY id_ciri (id_ciri);
+
+--
+-- Indeks untuk tabel tb_pasien
+--
+ALTER TABLE tb_pasien
+  ADD PRIMARY KEY (id_pasien);
+
+--
+-- AUTO_INCREMENT untuk tabel yang dibuang
+--
+
+--
+-- AUTO_INCREMENT untuk tabel tb_admin
+--
+ALTER TABLE tb_admin
+  MODIFY id_admin int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT untuk tabel tb_ciri
+--
+ALTER TABLE tb_ciri
+  MODIFY id_ciri int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+
+--
+-- AUTO_INCREMENT untuk tabel tb_dokter
+--
+ALTER TABLE tb_dokter
+  MODIFY id_dokter int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT untuk tabel tb_klasifikasi
+--
+ALTER TABLE tb_klasifikasi
+  MODIFY id_klasifikasi int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+
+--
+-- AUTO_INCREMENT untuk tabel tb_pasien
+--
+ALTER TABLE tb_pasien
+  MODIFY id_pasien int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+--
+
+--
+-- Ketidakleluasaan untuk tabel tb_klasifikasi
+--
+ALTER TABLE tb_klasifikasi
+  ADD CONSTRAINT a FOREIGN KEY (id_ciri) REFERENCES tb_ciri (id_ciri) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT b FOREIGN KEY (id_jenis) REFERENCES tb_jenis (id_jenis) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+saya ingin membuat diagnosa menggunakan deep learning untuk aplikasinya sudah saya buat. berikut bentuk model pada php
+
+model_penyakit
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class M_penyakit extends CI_Model
+{
+
+    public function kode()
+    {
+        $this->db->select('RIGHT(tb_jenis.id_jenis,2) as id_jenis', FALSE);
+        $this->db->order_by('id_jenis', 'DESC');
+        $this->db->limit(1);
+        $query = $this->db->get('tb_jenis');
+        //cek dulu apakah ada sudah ada kode di tabel. 
+
+        if ($query->num_rows() <> 0) {
+            //cek kode jika telah tersedia    
+            $data = $query->row();
+            $kode = intval($data->id_jenis) + 1;
+        } else {
+            $kode = 1;  //cek jika kode belum terdapat pada table
+        }
+
+        $batas = str_pad($kode, 2, "0", STR_PAD_LEFT);
+        $kodetampil = "A" . $batas;  //format kode
+        return $kodetampil;
+    }
+
+    public function getData($id_jenis)
+    {
+        $query = "SELECT * FROM tb_jenis WHERE id_jenis = '$id_jenis'";
+        return $this->db->query($query)->row_array();
+    }
+
+    public function editData($id_jenis, $data)
+    {
+        $this->db->where('id_jenis', $id_jenis);
+        $this->db->update('tb_jenis', $data);
+    }
+}
+
+model_pasien
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class M_pasien extends CI_Model
+{
+
+  public function getData()
+  {
+    $query = "SELECT t1.*, t2.nama_jenis FROM tb_pasien t1 LEFT JOIN tb_jenis t2 ON t1.id_penyakit = t2.id_jenis";
+
+    return $this->db->query($query)->result_array();
+  }
+
+  public function getDataById($id_pasien)
+  {
+    $query = "SELECT t1.*, t2.nama_jenis FROM tb_pasien t1 LEFT JOIN tb_jenis t2 ON t1.id_penyakit = t2.id_jenis WHERE id_pasien = '$id_pasien'";
+
+    return $this->db->query($query)->row_array();
+  }
+
+  public function tambahData($data)
+  {
+    $this->db->insert('tb_pasien', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function editData($id_pasien, $data)
+  {
+    $this->db->where('id_pasien', $id_pasien);
+    $this->db->update('tb_pasien', $data);
+  }
+
+  public function deleteData($id_pasien)
+  {
+    $this->db->where('id_pasien', $id_pasien);
+    $this->db->delete('tb_pasien');
+  }
+}
+
+model_gejala
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class M_gejala extends CI_Model
+{
+
+    public function getData($id_ciri)
+    {
+        $query = "SELECT * FROM tb_ciri WHERE id_ciri = '$id_ciri'";
+        return $this->db->query($query)->row_array();
+    }
+
+    public function editData($data, $id_ciri)
+    {
+        $this->db->where('id_ciri', $id_ciri);
+        $this->db->update('tb_ciri', $data);
+    }
+}
+
+model_dokter
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class M_gejala extends CI_Model
+{
+
+    public function getData($id_ciri)
+    {
+        $query = "SELECT * FROM tb_ciri WHERE id_ciri = '$id_ciri'";
+        return $this->db->query($query)->row_array();
+    }
+
+    public function editData($data, $id_ciri)
+    {
+        $this->db->where('id_ciri', $id_ciri);
+        $this->db->update('tb_ciri', $data);
+    }
+}
+
+model_klasifikasi
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class M_klasifikasi extends CI_Model
+{
+
+    public function getData()
+    {
+        $query = "SELECT tb_klasifikasi.*, tb_jenis.nama_jenis, tb_ciri.nama_ciri
+                    FROM tb_klasifikasi  
+                    JOIN tb_jenis ON tb_klasifikasi.id_jenis = tb_jenis.id_jenis 
+                    JOIN tb_ciri ON tb_klasifikasi.id_ciri = tb_ciri.id_ciri
+                    GROUP BY id_jenis
+                ";
+
+        return $this->db->query($query)->result_array();
+    }
+
+    public function getPenyakit()
+    {
+        $query = "SELECT * FROM tb_jenis";
+        return $this->db->query($query)->result_array();
+    }
+
+    public function getPenyakitById($id_jenis)
+    {
+        $query = "SELECT * FROM tb_jenis WHERE id_jenis='$id_jenis' ";
+        return $this->db->query($query)->row_array();
+    }
+
+    public function getGejala()
+    {
+        $query = "SELECT * FROM tb_ciri";
+        return $this->db->query($query)->result_array();
+    }
+
+    public function getById($id_jenis)
+    {
+        $query = "SELECT tb_klasifikasi.*, tb_jenis.nama_jenis, tb_ciri.nama_ciri,                    tb_ciri.bobot
+                    FROM tb_klasifikasi  
+                    JOIN tb_jenis ON tb_klasifikasi.id_jenis = tb_jenis.id_jenis 
+                    JOIN tb_ciri ON tb_klasifikasi.id_ciri = tb_ciri.id_ciri
+                    WHERE tb_klasifikasi.id_jenis = '$id_jenis'
+                ";
+
+        return $this->db->query($query)->result_array();
+    }
+
+    public function cekGejala($penyakit, $gejala)
+    {
+        $query = "SELECT * FROM tb_klasifikasi WHERE id_jenis='$penyakit' AND id_ciri='$gejala'";
+        return $this->db->query($query)->row_array();
+    }
+
+    public function getOption($id_jenis)
+    {
+        $query = " SELECT tb_ciri.id_ciri, nama_ciri, bobot 
+        FROM tb_ciri 
+        LEFT JOIN tb_klasifikasi 
+        ON tb_ciri.id_ciri = tb_klasifikasi.id_ciri 
+        AND tb_klasifikasi.id_jenis = '$id_jenis'
+        WHERE tb_klasifikasi.id_ciri IS NULL
+                ";
+        return $this->db->query($query)->result_array();
+    }
+}
+
+dan untuk controllernya
+dokter
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Dokter extends CI_Controller
+{
+
+  public function __construct()
+  {
+    parent::__construct();
+    if (!$this->session->userdata('username')) {
+      redirect('awal');
+    }
+    $this->load->library('form_validation');
+    $this->load->model('m_dokter');
+  }
+
+  public function index()
+  {
+    $data['dokter']      = $this->m_dokter->getData();
+    $data['judul']      = 'Daftar Dokter';
+    $data['sub_judul']  = 'Daftar Dokter';
+    $this->load->view('template/v_header', $data);
+    $this->load->view('template/v_sidebar');
+    $this->load->view('dokter/v_dokter', $data);
+    $this->load->view('template/v_footer');
+  }
+
+  public function tambah()
+  {
+    $data['judul'] = 'Tambah Data Dokter';
+    $data['sub_judul'] = 'Tambah Data Dokter';
+
+    $this->form_validation->set_rules('username', 'Username', 'trim|required');
+
+    if ($this->form_validation->run() == false) {
+      $this->load->view('template/v_header', $data);
+      $this->load->view('template/v_sidebar');
+      $this->load->view('dokter/v_adddokter', $data);
+      $this->load->view('template/v_footer');
+    } else {
+      // $id_dokter = $this->input->post('id_dokter', true);
+      $fullname = $this->input->post('fullname', true);
+      $username = $this->input->post('username', true);
+      // $password = $this->input->post('password', true);
+      $password = "password";
+      $jenis_kelamin = $this->input->post('jenis_kelamin', true);
+
+      $data = array(
+        'fullname' => $fullname,
+        'username' => $username,
+        'password' => $password,
+        'jenis_kelamin' => $jenis_kelamin,
+      );
+
+      $this->m_dokter->tambahData($data);
+
+      $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Dokter Berhasil di Tambahkan</div>');
+      redirect('dokter');
+    }
+  }
+
+  public function edit($id_dokter)
+  {
+    $data['judul']      = 'Edit Data Dokter';
+    $data['sub_judul']  = 'Edit Data Dokter';
+    $data['dokter'] = $this->m_dokter->getDataById($id_dokter);
+
+    $this->form_validation->set_rules('username', 'Username', 'trim|required');
+    $this->form_validation->set_rules('password', 'Password', 'trim|required');
+
+    if ($this->form_validation->run() == false) {
+      $this->load->view('template/v_header', $data);
+      $this->load->view('template/v_sidebar');
+      $this->load->view('dokter/v_editdokter', $data);
+      $this->load->view('template/v_footer');
+    } else {
+      $id_dokter = $this->input->post('id_dokter', true);
+      $fullname = $this->input->post('fullname', true);
+      $username = $this->input->post('username', true);
+      $password = $this->input->post('password', true);
+      // $password = "password";
+      $jenis_kelamin = $this->input->post('jenis_kelamin', true);
+
+      $data = array(
+        'fullname' => $fullname,
+        'username' => $username,
+        'password' => $password,
+        'jenis_kelamin' => $jenis_kelamin,
+      );
+
+      $this->m_dokter->editData($id_dokter, $data);
+
+      $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Dokter Berhasil di Edit</div>');
+      redirect('dokter');
+    }
+  }
+
+  public function delete($id_dokter)
+  {
+    $this->db->where('id_dokter', $id_dokter);
+    $this->db->delete('tb_dokter');
+    $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Dokter Berhasil di Hapus</div>');
+    redirect('dokter');
+  }
+
+  public function editprofile($id_dokter)
+  {
+    $data['dokter'] = $this->db->get_where('tb_dokter', ['id_dokter' => $id_dokter])->row_array();
+    $data['judul'] = 'Edit Data Dokter';
+    $data['sub_judul'] = 'Edit Data Dokter';
+
+    $this->form_validation->set_rules('username', 'Username', 'trim|required');
+    $this->form_validation->set_rules('password', 'Password', 'trim');
+    $this->form_validation->set_rules('password2', 'New Password', 'trim');
+    $this->form_validation->set_rules('password3', 'Confirm New Password', 'trim|matches[password2]');
+
+    if ($this->form_validation->run() == false) {
+      $this->load->view('template/v_header', $data);
+      $this->load->view('template/v_sidebar');
+      $this->load->view('dokter/v_editdokterprofile', $data);
+      $this->load->view('template/v_footer');
+    } else {
+      $username = $this->input->post('username', true);
+      $fullname = $this->input->post('fullname', true);
+      $jenis_kelamin = $this->input->post('jenis_kelamin', true);
+      $password = $this->input->post('password', true);
+      $password2 = $this->input->post('password2', true);
+      $password3 = $this->input->post('password3', true);
+
+      $input = [
+        'username' => $username,
+        'fullname' => $fullname,
+        'jenis_kelamin' => $jenis_kelamin
+      ];
+
+      // If the password fields are not empty, perform password validation and update
+      if (!empty($password) || !empty($password2) || !empty($password3)) {
+        // Check if the new password is the same as the old password
+        if ($password == $password2 || $password == $password3) {
+          $this->session->set_flashdata('error', 'New Password must not be the same as the old password');
+          redirect('admin/edit/' . $id_admin);
+        }
+
+        // If the new passwords do not match
+        if ($password2 != $password3) {
+          $this->session->set_flashdata('error', 'New Password and Confirm New Password do not match');
+          redirect('admin/edit/' . $id_admin);
+        }
+
+        // If the new password is empty
+        if (empty($password2) || empty($password3)) {
+          $this->session->set_flashdata('error', 'New Password fields must not be empty');
+          redirect('admin/edit/' . $id_admin);
+        }
+
+        // Update the password in the input array
+        $input['password'] = $password2;
+      }
+
+
+      $this->db->where('id_dokter', $id_dokter);
+      $this->db->update('tb_dokter', $input);
+      $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Dokter Berhasil di Edit</div>');
+      redirect('login');
+    }
+  }
+}
+
+gejala
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Gejala extends CI_Controller
+{
+
+    public function __construct()
+    {
+        parent::__construct();
+        if (!$this->session->userdata('username')) {
+            redirect('awal');
+        }
+        $this->load->library('form_validation');
+        $this->load->model('m_gejala', 'mega');
+    }
+
+    public function index()
+    {
+        $data['ciri']       = $this->db->get('tb_ciri')->result_array();
+        $data['judul']      = 'Daftar Gejala';
+        $data['sub_judul']  = 'Daftar Gejala';
+        $this->load->view('template/v_header', $data);
+        $this->load->view('template/v_sidebar');
+        $this->load->view('gejala/v_gejala', $data);
+        $this->load->view('template/v_footer');
+    }
+
+    public function tambah()
+    {
+        $data['judul']      = 'Tambah Data Gejala';
+        $data['sub_judul']  = 'Tambah Data Gejala';
+
+        // aturan validasi
+        $this->form_validation->set_rules('gejala', 'Gejala', 'trim|required');
+        $this->form_validation->set_rules('bobot', 'Bobot', 'trim|required');
+
+        if ($this->form_validation->run() == false) {
+            $this->load->view('template/v_header', $data);
+            $this->load->view('template/v_sidebar');
+            $this->load->view('gejala/v_addgejala', $data);
+            $this->load->view('template/v_footer');
+        } else {
+
+            $gejala = $this->input->post('gejala');
+            $bobot  = $this->input->post('bobot');
+
+            $data = array(
+                'nama_ciri' => $gejala,
+                'bobot'     => $bobot
+            );
+
+            $this->db->insert('tb_ciri', $data);
+
+            $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Gejala Berhasil di Tambahkan</div>');
+            redirect('gejala');
+        }
+    }
+
+    public function edit($id_ciri)
+    {
+        $data['judul']      = 'Edit Data Gejala';
+        $data['sub_judul']  = 'Edit Data Gejala';
+        $data['gejala']     = $this->mega->getData($id_ciri);
+
+        // aturan validasi
+        $this->form_validation->set_rules('gejala', 'Gejala', 'trim|required');
+        $this->form_validation->set_rules('bobot', 'Bobot', 'trim|required');
+
+        if ($this->form_validation->run() == false) {
+            $this->load->view('template/v_header', $data);
+            $this->load->view('template/v_sidebar');
+            $this->load->view('gejala/v_editgejala', $data);
+            $this->load->view('template/v_footer');
+        } else {
+
+            $id_ciri    = $this->input->post('id_ciri');
+            $gejala     = $this->input->post('gejala');
+            $bobot      = $this->input->post('bobot');
+
+            $data = array(
+                'nama_ciri' => $gejala,
+                'bobot'     => $bobot
+            );
+
+            $this->mega->editData($data, $id_ciri);
+
+            $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Gejala Berhasil di Ubah</div>');
+            redirect('gejala');
+        }
+    }
+
+    public function hapus($id_ciri)
+    {
+        $this->db->where('id_ciri', $id_ciri);
+        $this->db->delete('tb_ciri');
+        $this->session->set_flashdata('info', '<div class="alert alert-danger" role="alert">Data Gejala Berhasil di Hapus</div>');
+        redirect('gejala');
+    }
+}
+
+jenis_penyakit
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Jenis extends CI_Controller
+{
+
+    public function __construct()
+    {
+        parent::__construct();
+        if (!$this->session->userdata('username')) {
+            redirect('awal');
+        }
+        $this->load->library('form_validation');
+        $this->load->model('m_penyakit');
+    }
+
+    public function index()
+    {
+        $data['macam']      = $this->db->get('tb_jenis')->result_array();
+        $data['judul']      = 'Daftar Penyakit';
+        $data['sub_judul']  = 'Daftar Penyakit';
+        $this->load->view('template/v_header', $data);
+        $this->load->view('template/v_sidebar');
+        $this->load->view('penyakit/v_jenis', $data);
+        $this->load->view('template/v_footer');
+    }
+
+    public function tambah()
+    {
+        $data['id_jenis']   = $this->m_penyakit->kode();
+        $data['judul']      = 'Tambah Data Penyakit';
+        $data['sub_judul']  = 'Tambah Data Penyakit';
+
+        // aturan validasi
+        $this->form_validation->set_rules('penyakit', 'Penyakit', 'trim|required');
+        $this->form_validation->set_rules('detail', 'Detail Penyakit', 'trim|required');
+        $this->form_validation->set_rules('solusi', 'Solusi Penyakit', 'trim|required');
+
+        if ($this->form_validation->run() == false) {
+            $this->load->view('template/v_header', $data);
+            $this->load->view('template/v_sidebar');
+            $this->load->view('penyakit/v_addjenis', $data);
+            $this->load->view('template/v_footer');
+        } else {
+            $id_jenis   = $this->input->post('id_jenis', true);
+            $penyakit   = $this->input->post('penyakit', true);
+            $detail     = $this->input->post('detail', true);
+            $solusi     = $this->input->post('solusi', true);
+
+            $data = array(
+                'id_jenis'         => $id_jenis,
+                'nama_jenis'       => $penyakit,
+                'detail_jenis'     => $detail,
+                'solusi_jenis'     => $solusi
+            );
+
+            $this->db->insert('tb_jenis', $data);
+
+            $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Penyakit Berhasil di Tambahkan</div>');
+            redirect('jenis');
+        }
+    }
+
+    public function edit($id_jenis)
+    {
+        $data['judul']      = 'Edit Data Penyakit';
+        $data['sub_judul']  = 'Edit Data Penyakit';
+        $data['penyakit']   = $this->m_penyakit->getData($id_jenis);
+
+        // aturan validasi
+        $this->form_validation->set_rules('penyakit', 'Penyakit', 'trim|required');
+        $this->form_validation->set_rules('detail', 'Detail Penyakit', 'trim|required');
+        $this->form_validation->set_rules('solusi', 'Solusi Penyakit', 'trim|required');
+
+        if ($this->form_validation->run() == false) {
+            $this->load->view('template/v_header', $data);
+            $this->load->view('template/v_sidebar');
+            $this->load->view('penyakit/v_editjenis', $data);
+            $this->load->view('template/v_footer');
+        } else {
+            $id_jenis   = $this->input->post('id_jenis', true);
+            $penyakit   = $this->input->post('penyakit', true);
+            $detail     = $this->input->post('detail', true);
+            $solusi     = $this->input->post('solusi', true);
+
+            $data = array(
+                'nama_jenis'       => $penyakit,
+                'detail_jenis'     => $detail,
+                'solusi_jenis'     => $solusi
+            );
+
+            $this->m_penyakit->editData($id_jenis, $data);
+
+            $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Penyakit Berhasil di Ubah</div>');
+            redirect('jenis');
+        }
+    }
+
+    public function hapus($id_jenis)
+    {
+        $this->db->where('id_jenis', $id_jenis);
+        $this->db->delete('tb_jenis');
+        $this->session->set_flashdata('info', '<div class="alert alert-danger" role="alert">Data Penyakit Berhasil di Hapus</div>');
+        redirect('jenis');
+    }
+}
+
+klasifikasi
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Klasifikasi extends CI_Controller
+{
+
+    public function __construct()
+    {
+        parent::__construct();
+        if (!$this->session->userdata('username')) {
+            redirect('awal');
+        }
+        $this->load->model('m_klasifikasi', 'klas');
+    }
+
+    public function index()
+    {
+        $data['klas']       = $this->klas->getData();
+        $data['judul']      = 'Basis Pengetahuan';
+        $data['sub_judul']  = 'Basis Pengetahuan';
+        $this->load->view('template/v_header', $data);
+        $this->load->view('template/v_sidebar');
+        $this->load->view('kasus/v_klasifikasi', $data);
+        $this->load->view('template/v_footer');
+    }
+
+    public function detail($id_jenis)
+    {
+        $data['detail']     = $this->klas->getById($id_jenis);
+        $data['penyakit']   = $this->klas->getPenyakitById($id_jenis);
+        $data['judul']      = 'Detail Basis Pengetahuan';
+        $data['sub_judul']  = 'Detail Basis Pengetahuan';
+        $data['id_jenis']   = $id_jenis;
+        $this->load->view('template/v_header', $data);
+        $this->load->view('template/v_sidebar');
+        $this->load->view('kasus/v_detailklas', $data);
+        $this->load->view('template/v_footer');
+    }
+
+    public function tambah()
+    {
+        $data['judul']      = 'Tambah Basis Pengetahuan';
+        $data['sub_judul']  = 'Tambah Basis Pengetahuan';
+        $data['penyakit']   = $this->klas->getPenyakit();
+        $data['gejala']     = $this->klas->getGejala();
+
+        // aturan validasi
+        $this->form_validation->set_rules('penyakit', 'Penyakit', 'required|trim');
+
+        if ($this->form_validation->run() == false) {
+            $this->load->view('template/v_header', $data);
+            $this->load->view('template/v_sidebar');
+            $this->load->view('kasus/v_addklas', $data);
+            $this->load->view('template/v_footer', $data);
+        } else {
+            $penyakit   = $this->input->post('penyakit', true);
+
+            // Perulangan input gejala
+            foreach ($this->input->post('gejala', true) as $selected) {
+                $gejala = $selected;
+
+                //Cek Gejala
+                $cek_gejala = $this->klas->cekGejala($penyakit, $gejala);
+
+                //Buat kondisi
+                if ($cek_gejala) {
+                    true;
+                } else {
+                    $data = array(
+                        'id_jenis'         => $penyakit,
+                        'id_ciri'          => $gejala
+                    );
+
+                    //Insert Ke Database
+                    $this->db->insert('tb_klasifikasi', $data);
+                }
+            }
+            $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Berhasil di Tambahkan</div>');
+            redirect('klasifikasi');
+        }
+    }
+
+    //Hapus relasi
+    public function hapus($id_jenis)
+    {
+        $this->db->where('id_jenis', $id_jenis);
+        $this->db->delete('tb_klasifikasi');
+        $this->session->set_flashdata('info', '<div class="alert alert-danger" role="alert">Data Berhasil di Hapus</div>');
+        redirect('klasifikasi');
+    }
+
+    //Hapus Gejala Basis Kasus
+    public function hapusGejala($id_jenis, $id_ciri)
+    {
+        $penyakit = $this->klas->getPenyakitById($id_jenis);
+        $namape   = $penyakit['nama_jenis'];
+
+        $this->db->where('id_jenis', $id_jenis);
+        $this->db->where('id_ciri', $id_ciri);
+        $this->db->delete('tb_klasifikasi');
+        $this->session->set_flashdata('info', '<div class="alert alert-danger" role="alert">Gejala Penyakit ' . $namape . ' Berhasil di Hapus</div>');
+        redirect('klasifikasi/detail/' . $id_jenis);
+    }
+
+    //Tambah Gejala Basis Kasus
+    public function tambahGejala($id_jenis)
+    {
+        $data['judul']      = 'Tambah Gejala Penyakit';
+        $data['sub_judul']  = 'Tambah Gejala Penyakit';
+        $data['penyakit']   = $this->klas->getPenyakitById($id_jenis);
+        $data['detail']     = $this->klas->getById($id_jenis);
+        $data['gejala']     = $this->klas->getOption($id_jenis);
+
+        // aturan validasi
+        $this->form_validation->set_rules('id_gejala', 'ID Gejala', 'required|trim');
+
+        if ($this->form_validation->run() == false) {
+            $this->load->view('template/v_header', $data);
+            $this->load->view('template/v_sidebar');
+            $this->load->view('kasus/v_editkasus', $data);
+            $this->load->view('template/v_footer');
+        } else {
+            $id_jenis   = $this->input->post('id_jenis', true);
+            $id_ciri    = $this->input->post('id_gejala', true);
+
+            $data = array(
+                'id_jenis'  => $id_jenis,
+                'id_ciri'     => $id_ciri
+            );
+
+            $this->db->insert('tb_klasifikasi', $data);
+
+            $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Gejala Berhasil di Tambahkan</div>');
+            redirect('klasifikasi/detail/' . $id_jenis);
+        }
+    }
+}
+
+pasien
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Pasien extends CI_Controller
+{
+
+  public function __construct()
+  {
+    parent::__construct();
+    if (!$this->session->userdata('username')) {
+      redirect('awal');
+    }
+    $this->load->library('form_validation');
+    $this->load->model('m_pasien');
+  }
+
+  public function index()
+  {
+    $data['pasien']      = $this->m_pasien->getData();
+    $data['judul']      = 'Daftar Pasien';
+    $data['sub_judul']  = 'Daftar Pasien';
+    $this->load->view('template/v_header', $data);
+    $this->load->view('template/v_sidebar');
+    $this->load->view('pasien/v_pasien', $data);
+    $this->load->view('template/v_footer');
+  }
+
+  public function tambah()
+  {
+    $data['judul'] = 'Tambah Data Pasien';
+    $data['sub_judul'] = 'Tambah Data Pasien';
+    $data['jenis'] = $this->db->get('tb_jenis')->result_array();
+
+    $this->form_validation->set_rules('nama_pasien', 'Nama', 'trim|required');
+    $this->form_validation->set_rules('jenis_kelamin', 'Jenis Kelamin', 'trim|required');
+    $this->form_validation->set_rules('no_tlp', 'No Telepon', 'trim|required');
+
+    if ($this->form_validation->run() == false) {
+      $this->load->view('template/v_header', $data);
+      $this->load->view('template/v_sidebar');
+      $this->load->view('pasien/v_addpasien', $data);
+      $this->load->view('template/v_footer');
+    } else {
+      $id_pasien = $this->input->post('id_pasien', true);
+      $nama_pasien = $this->input->post('nama_pasien', true);
+      $jenis_kelamin = $this->input->post('jenis_kelamin', true);
+      $no_tlp = $this->input->post('no_tlp', true);
+      // $alamat = $this->input->post('alamat', true);
+      // $umur = $this->input->post('umur', true);
+      $id_penyakit = $this->input->post('id_penyakit', true);
+      $tgl_diagnosa = $this->input->post('tgl_diagnosa', true);
+
+      $data = array(
+        'nama_pasien' => $nama_pasien,
+        'jenis_kelamin' => $jenis_kelamin,
+        'no_tlp' => $no_tlp,
+        // 'alamat' => $alamat,
+        // 'umur' => $umur,
+        'id_penyakit' => $id_penyakit,
+        'tgl_diagnosa' => $tgl_diagnosa
+      );
+
+      $this->m_pasien->tambahData($data);
+
+      $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Pasien Berhasil di Tambahkan</div>');
+      redirect('pasien');
+    }
+  }
+
+  public function edit($id_pasien)
+  {
+    $data['judul']      = 'Edit Data Pasien';
+    $data['sub_judul']  = 'Edit Data Pasien';
+    $data['pasien'] = $this->m_pasien->getDataById($id_pasien);
+    $data['jenis'] = $this->db->get('tb_jenis')->result_array();
+    // $data['pasien'] = $this->db->get('tb_pasien')->result_array();
+
+    $this->form_validation->set_rules('nama_pasien', 'Nama', 'trim|required');
+    $this->form_validation->set_rules('jenis_kelamin', 'Jenis Kelamin', 'trim|required');
+    $this->form_validation->set_rules('no_tlp', 'No Telepon', 'trim|required');
+
+    if ($this->form_validation->run() == false) {
+      $this->load->view('template/v_header', $data);
+      $this->load->view('template/v_sidebar');
+      $this->load->view('pasien/v_editpasien', $data);
+      $this->load->view('template/v_footer');
+    } else {
+      $id_pasien = $this->input->post('id_pasien', true);
+      $nama_pasien = $this->input->post('nama_pasien', true);
+      $jenis_kelamin = $this->input->post('jenis_kelamin', true);
+      $no_tlp = $this->input->post('no_tlp', true);
+      // $alamat = $this->input->post('alamat', true);
+      // $umur = $this->input->post('umur', true);
+      $id_penyakit = $this->input->post('id_penyakit', true);
+      $tgl_diagnosa = $this->input->post('tgl_diagnosa', true);
+
+      $data = array(
+        'nama_pasien' => $nama_pasien,
+        'jenis_kelamin' => $jenis_kelamin,
+        'no_tlp' => $no_tlp,
+        // 'alamat' => $alamat,
+        // 'umur' => $umur,
+        'id_penyakit' => $id_penyakit,
+        'tgl_diagnosa' => $tgl_diagnosa
+      );
+
+      $this->m_pasien->editData($id_pasien, $data);
+
+      $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Pasien Berhasil di Edit</div>');
+      redirect('pasien');
+    }
+  }
+
+  public function delete($id_pasien)
+  {
+    $this->db->where('id_pasien', $id_pasien);
+    $this->db->delete('tb_pasien');
+    $this->session->set_flashdata('info', '<div class="alert alert-success" role="alert">Data Pasien Berhasil di Hapus</div>');
+    redirect('pasien');
+  }
+}
+
+sebelumnya juga saya sudah membuat diagnosanya dengan model seperti ini
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class M_konsultasi extends CI_Model
+{
+
+    public function getData()
+    {
+        $query = "SELECT A.*, (SELECT COUNT(id_jenis) FROM tb_klasifikasi WHERE id_jenis = A.id_jenis) AS jumlah, tb_jenis.nama_jenis, tb_ciri.nama_ciri, tb_jenis.solusi_jenis
+        FROM tb_klasifikasi A
+        JOIN tb_jenis ON tb_jenis.id_jenis = A.id_jenis
+        JOIN tb_ciri ON tb_ciri.id_ciri = A.id_ciri";
+
+        return $this->db->query($query)->result_array();
+    }
+
+    public function getJenis()
+    {
+        $query = "SELECT tb_klasifikasi.* FROM tb_klasifikasi GROUP BY id_jenis";
+        return $this->db->query($query)->result_array();
+    }
+
+    public function getPenyakit($jenis)
+    {
+        $query = "SELECT tb_jenis.* FROM tb_jenis WHERE id_jenis ='$jenis'";
+        return $this->db->query($query)->row_array();
+    }
+
+    public function getCiri($ciri)
+    {
+        $query = "SELECT tb_ciri.* FROM tb_ciri WHERE id_ciri ='$ciri'";
+        return $this->db->query($query)->row_array();
+    }
+
+    public function getSama($jenis, $ciri)
+    {
+        $query = "SELECT tb_klasifikasi.*, tb_ciri.bobot 
+        FROM tb_klasifikasi
+        JOIN tb_ciri ON tb_ciri.id_ciri = tb_klasifikasi.id_ciri  
+        WHERE tb_klasifikasi.id_jenis='$jenis' AND tb_klasifikasi.id_ciri='$ciri'";
+
+        return $this->db->query($query)->row_array();
+    }
+
+    public function getJmlCiri($jenis)
+    {
+
+        $this->db->from('tb_klasifikasi');
+        $this->db->where('id_jenis', $jenis);
+        return $this->db->count_all_results();
+    }
+
+    public function getPembagi($jenis)
+    {
+        $query = "SELECT SUM(tb_ciri.bobot) AS TOTAL
+                FROM tb_klasifikasi 
+                JOIN tb_ciri ON tb_ciri.id_ciri = tb_klasifikasi.id_ciri
+                WHERE id_jenis='$jenis'";
+        $bagi = $this->db->query($query)->row_array();
+        return $bagi['TOTAL'];
+    }
+}
+
+controller diagnosa seperti ini
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Konsultasi extends CI_Controller
+{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('m_konsultasi', 'konsul');
+    }
+
+    public function index()
+    {
+        $data['ciri']       = $this->db->get('tb_ciri')->result_array();
+        $data['judul']      = 'Halaman Konsultasi';
+        $data['sub_judul']  = 'Halaman Konsultasi';
+        $this->load->view('user/v_header', $data);
+        $this->load->view('user/v_sidebar');
+        $this->load->view('v_konsultasi', $data);
+        $this->load->view('user/v_footer');
+    }
+
+    public function proses()
+    {
+        $ciri = $this->input->post('ciri', true);
+
+        if (empty($ciri) || count($ciri) < 2 || count($ciri) > 10) {
+            redirect('konsultasi');
+        } else {
+            $data2   = $this->konsul->getJenis();
+
+            // Mulai Perhitungan Metode CBR
+            $i = 0;
+            foreach ($data2 as $row) {
+
+                $jml        = 0;
+                $nilai      = 0;
+                $jenis      = $row['id_jenis'];
+                $kasus      = $this->konsul->getPenyakit($jenis);
+                $penyakit   = $kasus['nama_jenis'];
+                $solusi = $kasus['solusi_jenis'];
+                $dipilih    = count($ciri);
+
+                // Perulangan perhitungan metode CBR
+                foreach ($ciri as $selected) {
+                    $ciri_item   = $selected;
+                    $row    = $this->konsul->getCiri($ciri_item);
+                    $get    = $this->konsul->getSama($jenis, $ciri_item);
+                    if (isset($get)) {
+                        $jml += 1;
+                        $nilai += (1 * $get['bobot']);
+                    } else {
+                        $jml += 0;
+                    }
+                }
+
+                $pembagi    = $this->konsul->getPembagi($jenis);
+                $jml_ciri   = $this->konsul->getJmlCiri($jenis);
+                $hasil = $nilai / $pembagi;
+
+                $final[$i] = array(
+                    'id_jenis'      => $jenis,
+                    'nama_jenis'    => $penyakit,
+                    'jml_cocok'     => $jml,
+                    'jml_gejala'    => $jml_ciri,
+                    'jml_dipilih'   => $dipilih,
+                    'bobot_sama'    => $nilai,
+                    'total_bobot'   => $pembagi,
+                    'hasil'         => $hasil,
+                    'solusi_jenis' => $solusi
+                );
+
+                $i++;
+            }
+
+            // Mengurutkan array hasil descending
+            $this->array_sort_by_column($final, 'hasil');
+
+            // Passing data ke Views
+            $data['judul']      = 'Hasil Analisa Metode CBR';
+            $data['sub_judul']  = 'Hasil Analisa Metode CBR';
+            $data['final']      = $final;
+            $data['klas']       = $this->konsul->getData();
+            $data['ciri']       = $ciri;
+            $this->load->view('user/v_header', $data);
+            $this->load->view('user/v_sidebar');
+            $this->load->view('v_perhitungan', $data);
+            $this->load->view('user/v_footer');
+        }
+    }
+
+
+    // Fungsi Descending Array
+    function array_sort_by_column(&$arr, $col, $dir = SORT_DESC)
+    {
+        $sort_col = array();
+        foreach ($arr as $key => $row) {
+            $sort_col[$key] = $row[$col];
+        }
+        array_multisort($sort_col, $dir, $arr);
+    }
+}
+
+dan viewnya 
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-4"><?= $sub_judul; ?></h1>
+        <p class="lead">Silahkan pilih gejala-gejala yang Anda alami, lalu klik PROSES</p>
+    </div>
+</div>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-xl-12 col-md-12 mb-4 info-konsul">
+            <div class="col mr-2">
+                <div class="text-xs text-center font-weight-bold text-uppercase mb-3">
+                    <h5>
+                        Silahkan Pilih Gejala Yang Anda Alami
+                    </h5>
+                </div>
+                <hr>
+
+                <div class="col-md-lg">
+
+                    <!-- <form class="user" method="post" action="<?= base_url('konsultasi/proses'); ?>">
+                        <?php
+                        $no = 1;
+                        foreach ($ciri as $row) { ?>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" name="ciri[]" id="ciri[]" value="<?= $row['id_ciri']; ?>">
+                                    </div>
+                                </div>
+                                <input readonly type="text" name="labelciri" class="form-control" value="<?= $row['nama_ciri']; ?>">
+                            </div>
+                        <?php }; ?>
+                        <br>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt"></i> &nbsp;Proses</button>
+                    </form> -->
+
+                    <form class="user" method="post" action="<?= base_url('konsultasi/proses'); ?>" onsubmit="return validateCheckboxes()">
+                        <?php
+                        $no = 1;
+                        foreach ($ciri as $row) { ?>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" name="ciri[]" id="ciri[]" value="<?= $row['id_ciri']; ?>" onclick="checkCheckboxes()">
+                                    </div>
+                                </div>
+                                <input readonly type="text" name="labelciri" class="form-control" value="<?= $row['nama_ciri']; ?>">
+                            </div>
+                        <?php }; ?>
+                        <br>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt"></i> &nbsp;Proses</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!-- /.container-fluid -->
+
+</div>
+<!-- End of Main Content -->
+
+<!-- Footer -->
+<footer class="sticky-footer bg-success mt-4">
+    <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+            <span>&copy;2021 <a href="http://mycoding.net">
+                    <font color="#FFF">MC Project</font>
+                </a></span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+
+</div>
+<!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Pilih "Logout" keluar.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                <a class="btn btn-primary" href="login.html">Keluar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function checkCheckboxes() {
+        var checkboxes = document.querySelectorAll('input[name="ciri[]"]');
+        var checkedCount = document.querySelectorAll('input[name="ciri[]"]:checked').length;
+
+        checkboxes.forEach(function(checkbox) {
+            if (checkedCount >= 10 && !checkbox.checked) {
+                checkbox.disabled = true;
+            } else {
+                checkbox.disabled = false;
+            }
+        });
+    }
+
+    function validateCheckboxes() {
+        var checkedCount = document.querySelectorAll('input[name="ciri[]"]:checked').length;
+        if (checkedCount < 1) {
+            alert('Pilih minimal Satu checkbox.');
+            return false;
+        } else if (checkedCount > 10) {
+            alert('Pilih maksimal sepuluh checkbox.');
+            return false;
+        }
+        return true;
+    }
+</script>
+
+semua di atas menggunakan php CI3 dan digunakan untuk metode CASE BASED-REASONING (CBR) dan sekarang saya ingin menggunakan metode deep learning yg mana deep learningnya saya ingin menggunakan golang dengan fiber. tolong bantu saya membuat full prgram golangnya dan mengubah model serta controller dan view diagnosa pada phpnya
